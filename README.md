@@ -64,3 +64,208 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+Nëse faqet e projektit janë të ndërtuara duke përdorur **Blade.php** (sistemi i shablloneve të Laravel), atëherë konfigurimi dhe struktura e projektit do të përditësohen pak për të reflektuar këtë ndryshim. Më poshtë është një version i përditësuar i **README.md**, duke marrë parasysh që frontend-i është pjesë e shablloneve të Laravel.
+
+---
+
+
+
+# Event Booking Website
+
+Ky projekt është një sistem për rezervimin e biletave për evente, i zhvilluar duke përdorur **Laravel** për backend dhe **Blade.php** për shabllonet e frontend-it. Gjithashtu, përfshin një panel administrativ për menaxhimin e rezervimeve.
+
+---
+
+## **Përmbajtja**
+
+1. [Kërkesat për Instalimin](#kërkesat-për-instalimin)  
+2. [Etapat për Implementimin](#etapat-për-implementimin)  
+   - [Instalimi i Backend dhe Frontend](#1-instalimi-i-backend-dhe-frontend)  
+3. [Konfigurimi](#konfigurimi)  
+4. [Struktura e Faqeve Blade](#struktura-e-faqeve-blade)  
+5. [Testimi i Projektit](#testimi-i-projektit)  
+6. [Funksionalitetet Kryesore](#funksionalitetet-kryesore)  
+
+---
+
+## **Kërkesat për Instalimin**
+
+Sigurohuni që keni instaluar:
+
+- **PHP** (versioni 8.0 ose më i lartë)  
+- **Composer** (menaxher paketash për PHP)  
+- **Node.js** dhe **npm** (për menaxhimin e varësive frontend)  
+- **Database** (MySQL ose MariaDB)  
+- **Web Server** (p.sh., Apache ose Nginx)  
+- **Git** (për klonimin e projektit)  
+- **WAMP/XAMPP** (për zhvillim lokal, opsionale)
+
+---
+
+## **Etapat për Implementimin**
+
+### **1. Instalimi i Backend dhe Frontend**
+
+1. **Klononi Projektin nga Repository**:  
+   ```bash
+   git clone https://github.com/username/event-booking.git
+   cd event-booking
+   ```
+
+2. **Instaloni varësitë me Composer**:  
+   ```bash
+   composer install
+   ```
+
+3. **Kopjoni skedarin `.env.example` në `.env`**:  
+   ```bash
+   cp .env.example .env
+   ```
+
+4. **Gjeneroni çelësin e aplikacionit**:  
+   ```bash
+   php artisan key:generate
+   ```
+
+5. **Konfiguroni bazën e të dhënave në `.env`**:  
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=event_booking
+   DB_USERNAME=root
+   DB_PASSWORD=''
+   ```
+
+6. **Ekzekutoni migrimet për të krijuar tabelat në bazën e të dhënave**:  
+   ```bash
+   php artisan migrate
+   ```
+
+7. **Seedoni të dhëna testimi (opsionale)**:  
+   ```bash
+   php artisan migrate --seed
+   ```
+
+8. **Instaloni varësitë e frontend-it**:
+   Instaloni Node.js dhe me pas ne terminal ekzekuto 
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+10. **Nisni serverin lokal të Laravel**:  
+   ```bash
+   php artisan serve
+   ```
+
+---
+
+## **Konfigurimi**
+
+1. **Rregullimi i Rrugëve**  
+   - Të gjitha rrugët janë të vendosura në `routes/web.php`.  
+   - Shembull:
+     ```php
+     Route::get('/', [HomeController::class, 'index'])->name('home');
+     Route::get('/admin/dashboard', [AdminController::class, 'index'])->middleware('auth')->name('admin.dashboard');
+     ```
+
+2. **Middleware për Autentikim**  
+   - Sigurohuni që të përdorni middleware për të mbrojtur rrugët e dashboard-it:  
+     ```php
+     Route::group(['middleware' => 'auth'], function () {
+         Route::get('/admin/dashboard', [AdminController::class, 'index']);
+     });
+     ```
+
+3. **Integrimi i CSS dhe JavaScript**  
+   - Përdorni **Blade** për të përfshirë skedarët CSS dhe JS në faqet tuaja:
+     ```blade
+     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+     <script src="{{ asset('js/app.js') }}" defer></script>
+     ```
+
+---
+
+## **Struktura e Faqeve Blade**
+
+1. **Shablloni Kryesor (`resources/views/layouts/app.blade.php`)**  
+   - Ky skedar përmban header, footer dhe skedarët kryesorë CSS/JS:
+     ```blade
+     <!DOCTYPE html>
+     <html lang="en">
+     <head>
+         <meta charset="UTF-8">
+         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+         <title>@yield('title', 'Event Booking')</title>
+         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+     </head>
+     <body>
+         @include('partials.navbar')
+         <main>
+             @yield('content')
+         </main>
+         <script src="{{ asset('js/app.js') }}" defer></script>
+     </body>
+     </html>
+     ```
+
+2. **Faqet e Veçanta**
+   - Faqja kryesore (`resources/views/home.blade.php`):
+     ```blade
+     @extends('layouts.app')
+
+     @section('content')
+     <h1>Mirë se vini në Event Booking</h1>
+     <p>Rezervoni bileta për eventet tuaja të preferuara!</p>
+     @endsection
+     ```
+
+   - Dashboard (`resources/views/admin/dashboard.blade.php`):
+     ```blade
+     @extends('layouts.app')
+
+     @section('content')
+     <h1>Paneli Administrativ</h1>
+     <p>Menaxhoni rezervimet dhe eventet këtu.</p>
+     @endsection
+     ```
+
+---
+
+## **Testimi i Projektit**
+
+1. **Frontend**  
+   - Kontrolloni shfaqjen dhe funksionalitetin e formave për rezervimin e biletave.
+
+2. **Backend**  
+   - Përdorni Postman për të testuar endpoint-et API (p.sh., rezervimi i biletave).
+
+3. **Autentikimi dhe Paneli Admin**  
+   - Hyni si admin dhe kontrolloni aksesin në dashboard.
+
+4. **Testime të Plota**  
+   - Kontrolloni ndërveprimin midis formave të frontend-it dhe backend-it për të siguruar që të dhënat të ruhen në bazën e të dhënave.
+
+---
+
+## **Funksionalitetet Kryesore**
+
+1. **Rezervimi i Biletave**  
+   - Përdoruesit mund të rezervojnë bileta për eventet e listuara.
+
+2. **Paneli Administrativ**  
+   - Adminët mund të menaxhojnë rezervimet dhe të ndryshojnë statusin e tyre.
+
+3. **Autentikimi**  
+   - Adminët mund të hyjnë në sistem përmes një mekanizmi të sigurt autentikimi.
+
+4. **Integrim i Email-eve**  
+   - Konfirmimet e rezervimeve dërgohen automatikisht me email.
+
+--- 
+
+Kjo strukturë siguron që kushdo mund ta instalojë dhe përdorë projektin me lehtësi.
